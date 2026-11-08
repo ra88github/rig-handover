@@ -1,8 +1,9 @@
 ---
 plan: morning-digest
-status: ready
+status: done
 owner: rook
 opened: 2026-10-29
+closed: 2026-11-08
 ---
 
 # Morning digest
@@ -77,3 +78,20 @@ page again with `LANE_MARKER` unset (the banner reads "no marker set") and uploa
 link. Move this plan to `docs/plans/done/` with its issue list.
 
 Done when: the preview link no longer shows the lane marker.
+
+## Issues
+
+| # | Issue | Blocked by | Worker | Closed |
+|---|-------|-----------|--------|--------|
+| 1 | Digest types: DigestRow and readNight signature | — | claude-code · opus-5.5 · medium | 2026-11-08 |
+| 2 | Run log reader | #1 | claude-code · opus-5.5 · high | 2026-11-08 |
+| 3 | Digest page: GET /digest/:night | #1 to start · #2 to close | claude-code · sonnet-5.5 · low | 2026-11-08 |
+| 4 | Digest JSON: GET /api/digest/:night | #1 to start · #2, #3 to close | claude-code · haiku-5.5 · low | 2026-11-08 |
+| 5 | Board links each night to its digest | #1 to start · #2, #3 to close | claude-code · sonnet-5.5 · low | 2026-11-08 |
+| 6 | Digest route tests | #1 to start · #3, #4 to close | claude-code · sonnet-5.5 · low | 2026-11-08 |
+| 7 | Preview for review | #3 | claude-code · opus-5.5 · high | 2026-11-08 |
+| 8 | Clean up preview, close the plan | #7 and the review | claude-code · opus-5.5 · high | 2026-11-08 |
+
+#7 was first closed when the link was sent, before the reviewer looked; it was reopened until the
+review was in. The preview is built and published by `.github/workflows/preview.yml` on GitHub
+Pages and never committed (ADR 0003); the marker came from a repo secret, deleted for the clean-up.
