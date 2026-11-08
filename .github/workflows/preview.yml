@@ -1,0 +1,58 @@
+name: preview
+
+# Plan morning-digest § 3 and § 4, ADR 0003: run rig, save one page with curl, publish it on
+# GitHub Pages. The page is never committed; the Pages artifact expires after a day.
+# The lane marker comes from the LANE_MARKER secret; delete the secret and run again to take it off.
+
+on:
+  workflow_dispatch:
+    inputs:
+      night:
+        description: Night to preview (YYYY-MM-DD)
+        required: true
+        default: '2026-10-28'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: npm install -g pnpm@12.18.0
+      - run: pnpm install --frozen-lockfile
+      - name: Save the page
+        env:
+          NIGHT: ${{ inputs.night }}
+          LANE_MARKER: ${{ secrets.LANE_MARKER }}
+        run: |
+          [[ "$NIGHT" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "bad night: $NIGHT"; exit 1; }
+          pnpm start &
+          for i in $(seq 1 30); do curl -fsS http://localhost:8787/health > /dev/null && break; sleep 1; done
+          mkdir -p _site
+          curl -fsS "http://localhost:8787/digest/$NIGHT" -o _site/index.html
+          grep -q 'class="marker"' _site/index.html
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
