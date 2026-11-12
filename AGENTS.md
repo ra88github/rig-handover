@@ -25,10 +25,22 @@ Read first: `docs/vision.md`, `docs/styleguide.md`. Decisions: `docs/adr/`.
    done: <what changed, one line>
    worker: <harness> · <model> · <effort>
    commit: <sha or "none">
+   evidence:
+   - <one "Done when" item, as the issue words it>: <what shows it holds>
    ```
 
-5. An issue is closed only when its "Done when" holds. If it can't hold yet, leave it open and
-   say what it waits on.
+   One evidence line per "Done when" item, in the issue's order. What shows it is captured from
+   the build at `commit`, not written from memory: the command you ran and the output line that
+   shows the result (for a page or a JSON route, the curl command and the lines that matter). If
+   nothing you can run shows it, write `missing tool: <what would show it>`.
+
+   `commit` is your own commit when it builds alone. When the "Done when" needs work from the
+   issues yours was blocked by, `commit` is the merge that brings that work in, and the issue
+   closes only after that merge.
+
+5. An issue is closed only when its "Done when" holds and every evidence line shows it. A
+   `missing tool` line keeps the issue open until the tool exists or a human accepts it without
+   one. If it can't hold yet, leave it open and say what it waits on.
 
 ## Skills
 
